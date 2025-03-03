@@ -5,12 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hasr Menu</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #00051b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #fff;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 10px rgba(0, 191, 255, 0.8);
+            font-size: 48px;
+        }
+
+        .waterfall {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .drop {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to bottom, 
+                rgba(0, 191, 255, 0.8),
+                rgba(0, 172, 230, 0.4));
+            animation: fall linear infinite;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 191, 255, 0.6);
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(0, 191, 255, 0.3);
+            animation: ripple 1s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.5;
+            }
+            100% {
+                width: 100px;
+                height: 100px;
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="waterfall"></div>
     <h1>Привет! Hasr!</h1>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
+
+        // Создание анимации водопада
+        function createWaterfall() {
+            const waterfall = document.querySelector('.waterfall');
+            
+            function createDrop() {
+                const drop = document.createElement('div');
+                drop.className = 'drop';
+                drop.style.left = Math.random() * 100 + 'vw';
+                drop.style.animationDuration = (Math.random() * 0.5 + 0.5) + 's';
+                
+                drop.addEventListener('animationend', () => {
+                    const ripple = document.createElement('div');
+                    ripple.className = 'ripple';
+                    ripple.style.left = drop.style.left;
+                    ripple.style.bottom = '0';
+                    waterfall.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 1000);
+                    drop.remove();
+                });
+                
+                waterfall.appendChild(drop);
+            }
+
+            // Создаем 100 капель
+            for (let i = 0; i < 100; i++) {
+                setTimeout(createDrop, Math.random() * 1000);
+            }
+
+            // Продолжаем создавать новые капли
+            setInterval(createDrop, 50);
+        }
+
+        window.onload = createWaterfall;
     </script>
 </body>
 </html>
