@@ -168,7 +168,7 @@
     </style>
 </head>
 <body>
-    <h1>Hasr Menu</h1>
+    <h1>Hasr menu</h1>
     <div class="button-container" id="mainMenu">
         <button onclick="showLogin()">Профиль</button>
         <button>Статистика</button>
@@ -216,49 +216,38 @@
             const nickname = document.getElementById('nickname').value.trim();
             const password = document.getElementById('password').value.trim();
 
-            try {
-                const response = await fetch('https://TimurFix.pythonanywhere.com/get_profile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nickname, password })
-                });
+            const response = await fetch('https://TimurFix.pythonanywhere.com/get_profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nickname, password })
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (response.ok) {
-                    currentUser = nickname;
-                    localStorage.setItem('currentUser', nickname);
-                    localStorage.setItem('password', password); // Сохраняем пароль для повторных запросов
-                    document.getElementById('loginModal').style.display = 'none';
-                    showProfile(data.nickname, data.balance);
-                } else {
-                    alert(data.error || 'Ошибка авторизации');
-                }
-            } catch (error) {
-                alert('Ошибка подключения к серверу: ' + error.message);
+            if (response.ok) {
+                currentUser = nickname;
+                localStorage.setItem('currentUser', nickname);
+                document.getElementById('loginModal').style.display = 'none';
+                showProfile(data.nickname, data.balance);
+            } else {
+                alert(data.error || 'Ошибка авторизации');
             }
         }
 
         // Запрос профиля для уже авторизованного пользователя
         async function fetchProfile(nickname) {
-            const password = localStorage.getItem('password') || '';
-            try {
-                const response = await fetch('https://TimurFix.pythonanywhere.com/get_profile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nickname, password })
-                });
+            const response = await fetch('https://TimurFix.pythonanywhere.com/get_profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nickname, password: localStorage.getItem('password') || '' })
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (response.ok) {
-                    showProfile(data.nickname, data.balance);
-                } else {
-                    logout(); // Если данные невалидны, разлогиниваем
-                }
-            } catch (error) {
-                alert('Ошибка подключения к серверу: ' + error.message);
-                logout();
+            if (response.ok) {
+                showProfile(data.nickname, data.balance);
+            } else {
+                logout(); // Если данные невалидны, разлогиниваем
             }
         }
 
